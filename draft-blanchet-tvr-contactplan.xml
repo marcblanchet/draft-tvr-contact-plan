@@ -82,6 +82,7 @@
     <section>
       <name>Data Model</name>
       <t>The Yang data model augments the Bundle Protocol Yang data model<xref target="draft-blanchet-dtn-bp-yang-model"/> by adding the TVR schedule Yang data model <xref target="draft-qu-tvr-schedule-yang"/> to the neighbors of a Bundle protocol node.</t>
+      <t>In the case of DTN networks using Bundle Protocol, additional attributes are used on the contact, such as the bandwidth of the convergence layer adapter link at the time of the contact. It is added to the augmentation.</t>
       <artwork><![CDATA[
   <CODE BEGINS> file "ietf-tvr-bundle-schedule@2023-07-05.yang"
   module ietf-tvr-bundle-schedule {
@@ -150,6 +151,13 @@
         description
           "Augment Bundle node neighbor with a contact schedule.";
         uses tvr-schedule:schedule;
+        leaf bandwidth {
+          type yang:gauge64;
+          units "bits/second";
+          description
+            "An estimate of the convergence layer current bandwidth in bits
+             per second";
+        }
       }
       description
         "Augment the neighbor with a contact schedule.";
