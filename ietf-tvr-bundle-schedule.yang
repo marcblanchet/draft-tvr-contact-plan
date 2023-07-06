@@ -9,7 +9,6 @@ module ietf-tvr-bundle-schedule {
   import ietf-tvr-schedule {
     prefix tvr-schedule;
   }
-  
   import ietf-yang-types {
     prefix yang;
   }
@@ -71,8 +70,8 @@ module ietf-tvr-bundle-schedule {
         type yang:gauge64;
         units "bits/second";
         description
-            "An estimate of the convergence layer current bandwidth in bits
-            per second";
+          "An estimate of the convergence layer current bandwidth in bits
+           per second";
       }
     }
     description
