@@ -9,6 +9,10 @@ module ietf-tvr-bundle-schedule {
   import ietf-tvr-schedule {
     prefix tvr-schedule;
   }
+  
+  import ietf-yang-types {
+    prefix yang;
+  }
 
   organization
     "IETF TVR - Time Variant Routing Working Group";
@@ -63,6 +67,13 @@ module ietf-tvr-bundle-schedule {
       description
         "Augment Bundle node neighbor with a contact schedule.";
       uses tvr-schedule:schedule;
+      leaf bandwidth {
+        type yang:gauge64;
+        units "bits/second";
+        description
+            "An estimate of the convergence layer current bandwidth in bits
+            per second";
+      }
     }
     description
       "Augment the neighbor with a contact schedule.";
