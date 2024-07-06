@@ -10,7 +10,7 @@
 <rfc
   xmlns:xi="http://www.w3.org/2001/XInclude"
   category="std"
-  docName="draft-blanchet-tvr-contactplan-01"
+  docName="draft-blanchet-tvr-contactplan-02"
   ipr="trust200902"
   obsoletes=""
   updates=""
@@ -18,8 +18,7 @@
   xml:lang="en"
   version="3">
   <front>
-    <title abbrev="TVR Contact Plan">Contact Plan Yang Model for Time-Variant Routing of the Bundle Protocol</title>
-    <seriesInfo name="Internet-Draft" value="draft-blanchet-tvr-contactplan-01"/>
+    <title abbrev="TVR Contact Plan">Contact Plan YANG Model for Time-Variant Routing of the Bundle Protocol</title>
     <author fullname="Marc Blanchet" initials="MB">
       <organization>Viagenie</organization>
       <address>
@@ -42,17 +41,13 @@
       <organization>Futurewei</organization>
       <address>
         <postal>
-          <street>2330 Central Expressway</street>
-          <city>Santa Clara</city>
-          <region>CA</region>
-          <code>95050</code>
           <country>USA</country>
         </postal>
         <phone></phone>
         <email>yingzhen.qu@futurewei.com</email>
       </address>
     </author>
-    <date year="2023"/>
+    <date/>
     <area>Routing</area>
     <workgroup>Internet Engineering Task Force</workgroup>
     <keyword>dtn</keyword>
@@ -60,7 +55,7 @@
     <keyword>time-variant routing</keyword>
     <keyword>contact plan</keyword>
     <abstract>
-      <t>Some networks, such as in space, have links that are up and down based on a known schedule. The links characteristics, such as latency and bandwidth, are often also known in advance and are important information for routing decisions. This document describes a Yang data model, also known as contact plan. This specification applies to the Bundle Protocol.</t>
+      <t>Some networks, such as in space, have links that are up and down based on a known schedule. The links characteristics, such as latency and bandwidth, are often also known in advance and are important information for routing decisions. This document describes a YANG data model, also known as contact plan. This specification applies to the Bundle Protocol.</t>
     </abstract>
   </front>
   <middle>
@@ -79,90 +74,151 @@
           all capitals, as shown here.</t>
       </section>
       </section>
+
+      <section title="Tree Diagrams">
+        <t>
+        This document uses the graphical representation of data models
+        defined in <xref target="RFC8340"/>.</t>
+        <t>
+        The following figure shows the tree diagram of the ietf-tvr-bundle-schedule module.</t>
+        <artwork>
+module: ietf-tvr-bundle-schedule
+
+  augment /bundle:node/bundle:neighbors/bundle:neighbor:
+    +--rw contact-schedule
+       +--rw schedules* [schedule-id]
+       |  +--rw schedule-id                     uint32
+       |  +--rw (schedule-type)?
+       |  |  +--:(period)
+       |  |  |  +--rw period-description?       string
+       |  |  |  +--rw period-start              yang:date-and-time
+       |  |  |  +--rw time-zone-identifier?     sys:timezone-name
+       |  |  |  +--rw (period-type)?
+       |  |  |     +--:(explicit)
+       |  |  |     |  +--rw period-end?         yang:date-and-time
+       |  |  |     +--:(duration)
+       |  |  |        +--rw duration?           duration
+       |  |  +--:(recurrence)
+       |  |     +--rw recurrence-first
+       |  |     |  +--rw utc-start-time?   yang:date-and-time
+       |  |     |  +--rw duration?         uint32
+       |  |     +--rw (recurrence-bound)?
+       |  |     |  +--:(until)
+       |  |     |  |  +--rw utc-until?          yang:date-and-time
+       |  |     |  +--:(count)
+       |  |     |     +--rw count?              uint32
+       |  |     +--rw recurrence-description?   string
+       |  |     +--rw frequency                 identityref
+       |  |     +--rw interval?                 uint32
+       |  +--rw attr-value
+       |     +--rw bandwidth?   yang:gauge64
+       +--rw bandwidth?   yang:gauge64
+        </artwork>
+      
+    </section>
     <section>
       <name>Data Model</name>
-      <t>The Yang data model augments the Bundle Protocol Yang data model<xref target="draft-blanchet-dtn-bp-yang-model"/> by adding the TVR schedule Yang data model <xref target="draft-qu-tvr-schedule-yang"/> to the neighbors of a Bundle protocol node.</t>
+      <t>The YANG data model augments the Bundle Protocol YANG data model<xref target="draft-blanchet-dtn-bp-yang-model"/> by adding the TVR schedule YANG data model <xref target="draft-ietf-tvr-schedule-yang"/> to the neighbors of a Bundle protocol node.</t>
       <t>In the case of DTN networks using Bundle Protocol, additional attributes are used on the contact, such as the bandwidth of the convergence layer adapter link at the time of the contact. It is added to the augmentation.</t>
       <artwork><![CDATA[
-  <CODE BEGINS> file "ietf-tvr-bundle-schedule@2023-07-05.yang"
-  module ietf-tvr-bundle-schedule {
-    yang-version 1.1;
-    namespace "urn:ietf:params:xml:ns:yang:ietf-tvr-bundle-schedule";
-    prefix bundle-schedule;
+  <CODE BEGINS> file "ietf-tvr-bundle-schedule@2024-07-06.yang"
+module ietf-tvr-bundle-schedule {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:ietf-tvr-bundle-schedule";
+  prefix bundle-schedule;
 
-    import ietf-bundle-protocol {
-      prefix bundle;
-    }
-    import ietf-tvr-schedule {
-      prefix tvr-schedule;
-    }
+  import ietf-bundle-protocol {
+    prefix bundle;
+  }
+  import ietf-tvr-schedule {
+    prefix tvr-schd;
+  }
+  import ietf-yang-types {
+    prefix yang;
+  }
 
-    organization
-      "IETF TVR - Time Variant Routing Working Group";
-    contact
-      "WG Web:   <http://datatracker.ietf.org/wg/tvr>
-       WG List:  <mailto:tvr@ietf.org>
+  organization
+    "IETF TVR - Time Variant Routing Working Group";
+  contact
+    "WG Web:   <http://datatracker.ietf.org/wg/tvr>
+     WG List:  <mailto:tvr@ietf.org>
 
-       Author:   Marc Blanchet
-                 <mailto:marc.blanchet@viagenie.ca>
-       Author:   Yingzhen Qu
-                 <mailto:yingzhen.ietf@gmail.com>
-       Author:   Leigh Jordan Torgerson
-                 <mailto:jordan.l.torgerson@jpl.nasa.gov>";
+     Author:   Marc Blanchet
+               <mailto:marc.blanchet@viagenie.ca>
+     Author:   Yingzhen Qu
+               <mailto:yingzhen.ietf@gmail.com>
+     Author:   Leigh Jordan Torgerson
+               <mailto:jordan.l.torgerson@jpl.nasa.gov>";
+  description
+    "The YANG module defines an augmentation to the Bundle
+     protocol YANG model.
 
+     This YANG model conforms to the Network Management
+     Datastore Architecture (NMDA) as described in RFC 8342.
+
+     Copyright (c) 2024 IETF Trust and the persons identified as
+     authors of the code.  All rights reserved.
+
+     Redistribution and use in source and binary forms, with or
+     without modification, is permitted pursuant to, and subject to
+     the license terms contained in, the Revised BSD License set
+     forth in Section 4.c of the IETF Trust's Legal Provisions
+     Relating to IETF Documents
+     (https://trustee.ietf.org/license-info).
+
+     This version of this YANG module is part of RFC XXXX
+     (https://www.rfc-editor.org/info/rfcXXXX); see the RFC itself
+     for full legal notices.
+
+     The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL
+     NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'NOT RECOMMENDED',
+     'MAY', and 'OPTIONAL' in this document are to be interpreted as
+     described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
+     they appear in all capitals, as shown here.";
+  reference
+    "RFC XXXX: Contact Plan YANG Model for Time-Variant Routing of
+               the Bundle Protocol";
+
+  revision 2024-07-06 {
     description
-      "The YANG module defines an augmentation to the Bundle
-       protocol YANG mode.
-
-       This YANG model conforms to the Network Management
-       Datastore Architecture (NMDA) as described in RFC 8342.
-
-       Copyright (c) 2023 IETF Trust and the persons identified as
-       authors of the code.  All rights reserved.
-
-       Redistribution and use in source and binary forms, with or
-       without modification, is permitted pursuant to, and subject to
-       the license terms contained in, the Revised BSD License set
-       forth in Section 4.c of the IETF Trust's Legal Provisions
-       Relating to IETF Documents
-       (https://trustee.ietf.org/license-info).
-
-       This version of this YANG module is part of RFC XXXX
-       (https://www.rfc-editor.org/info/rfcXXXX); see the RFC itself
-       for full legal notices.
-
-       The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL
-       NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'NOT RECOMMENDED',
-       'MAY', and 'OPTIONAL' in this document are to be interpreted as
-       described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
-       they appear in all capitals, as shown here.";
+      "Initial Version";
     reference
-      "RFC XXXX: Contact Plan Yang Model for Time-Variant Routing of the Bundle Protocol";
+      "RFC XXXX: Contact Plan YANG Model for Time-Variant Routing
+                 of the Bundle Protocol.";
+  }
 
-    revision 2023-07-05 {
+  augment "/bundle:node/bundle:neighbors/bundle:neighbor" {
+    container contact-schedule {
       description
-        "Initial Version";
-      reference
-        "RFC XXXX: Contact Plan Yang Model for Time-Variant Routing of the Bundle Protocol.";
-    }
+        "Augment Bundle node neighbor with a contact schedule.";
 
-    augment "/bundle:node/bundle:neighbors/bundle:neighbor" {
-      container contact-schedule {
-        description
-          "Augment Bundle node neighbor with a contact schedule.";
-        uses tvr-schedule:schedule;
-        leaf bandwidth {
-          type yang:gauge64;
-          units "bits/second";
+      uses tvr-schd:tvr-schedule {
+        augment "schedules/attr-value" {
           description
-            "An estimate of the convergence layer current bandwidth in bits
-             per second";
+            "Augment the power state within each period.";
+          leaf bandwidth {
+            type yang:gauge64;
+            units "bits/second";
+            description
+              "An estimate of the convergence layer bandwidth
+              in bits per second during the scheduled time.";
+          }
         }
       }
-      description
-        "Augment the neighbor with a contact schedule.";
+
+      leaf bandwidth {
+        type yang:gauge64;
+        units "bits/second";
+        default "0";
+        description
+          "The convergence layer default bandwidth in bits
+           per second.";
+      }
     }
+    description
+      "Augment the neighbor with a contact schedule.";
   }
+}
   <CODE ENDS>
         ]]></artwork>
     </section>
@@ -226,27 +282,30 @@
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.6242.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8040.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8174.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8340.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8341.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8446.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.9171.xml"/>
-        <reference anchor="draft-qu-tvr-schedule-yang" target="draft-qu-tvr-schedule-yang">
+        <reference anchor="draft-ietf-tvr-schedule-yang" target="draft-ietf-tvr-schedule-yang">
              <front>
                  <title>YANG Model for Scheduled Attributes</title>
                  <author fullname="Yingzhen Qu" initials="Y" surname="Qu"/>
                  <author fullname="Acee Lindem" initials="A." surname="Lindem"/>
+                 <author fullname="Eric Kinzie" initials="E." surname="Kinzie"/>
+                 <author fullname="Don Fedyk" initials="D." surname="Fedyk"/>
                  <author fullname="Marc Blanchet" initials="M" surname="Blanchet"/>
-                 <date month="07" year="2023"/>
+                 <date/>
              </front>
-             <seriesInfo name="Internet-Draft" value="draft-qu-tvr-schedule-yang-00"/>
+             <seriesInfo name="Internet-Draft" value="draft-ietf-tvr-schedule-yang-01"/>
          </reference>
         <reference anchor="draft-blanchet-dtn-bp-yang-model" target="draft-blanchet-dtn-bp-yang-model">
              <front>
                  <title>Bundle Protocol Yang Model</title>
                  <author fullname="Marc Blanchet" initials="M" surname="Blanchet"/>
                  <author fullname="Yingzhen Qu" initials="Y" surname="Qu"/>
-                 <date month="07" year="2023"/>
+                 <date/>
              </front>
-             <seriesInfo name="Internet-Draft" value="draft-blanchet-dtn-bp-yang-model-00"/>
+             <seriesInfo name="Internet-Draft" value="draft-blanchet-dtn-bp-yang-model-02"/>
          </reference>
 
       </references>

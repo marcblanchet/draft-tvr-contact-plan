@@ -7,7 +7,7 @@ module ietf-tvr-bundle-schedule {
     prefix bundle;
   }
   import ietf-tvr-schedule {
-    prefix tvr-schedule;
+    prefix tvr-schd;
   }
   import ietf-yang-types {
     prefix yang;
@@ -27,12 +27,12 @@ module ietf-tvr-bundle-schedule {
                <mailto:jordan.l.torgerson@jpl.nasa.gov>";
   description
     "The YANG module defines an augmentation to the Bundle
-     protocol YANG mode.
+     protocol YANG model.
 
      This YANG model conforms to the Network Management
      Datastore Architecture (NMDA) as described in RFC 8342.
 
-     Copyright (c) 2023 IETF Trust and the persons identified as
+     Copyright (c) 2024 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
 
      Redistribution and use in source and binary forms, with or
@@ -52,26 +52,43 @@ module ietf-tvr-bundle-schedule {
      described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
      they appear in all capitals, as shown here.";
   reference
-    "RFC XXXX: Contact Plan Yang Model for Time-Variant Routing of the Bundle Protocol";
+    "RFC XXXX: Contact Plan YANG Model for Time-Variant Routing of
+               the Bundle Protocol";
 
-  revision 2023-07-05 {
+  revision 2024-07-06 {
     description
       "Initial Version";
     reference
-      "RFC XXXX: Contact Plan Yang Model for Time-Variant Routing of the Bundle Protocol.";
+      "RFC XXXX: Contact Plan YANG Model for Time-Variant Routing
+                 of the Bundle Protocol.";
   }
 
   augment "/bundle:node/bundle:neighbors/bundle:neighbor" {
     container contact-schedule {
       description
         "Augment Bundle node neighbor with a contact schedule.";
-      uses tvr-schedule:schedule;
+
+      uses tvr-schd:tvr-schedule {
+        augment "schedules/attr-value" {
+          description
+            "Augment the power state within each period.";
+          leaf bandwidth {
+            type yang:gauge64;
+            units "bits/second";
+            description
+              "An estimate of the convergence layer bandwidth
+              in bits per second during the scheduled time.";
+          }
+        }
+      }
+
       leaf bandwidth {
         type yang:gauge64;
         units "bits/second";
+        default "0";
         description
-          "An estimate of the convergence layer current bandwidth in bits
-           per second";
+          "The convergence layer default bandwidth in bits
+           per second.";
       }
     }
     description
